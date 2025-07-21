@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="pdf-area">
     <h1>Ofis Masraf Takip</h1>
 
     <form id="expense-form">
@@ -55,7 +55,10 @@
       <p>Hüda Toplam Ödedi: <span id="overall-huda">0.00</span> TL</p>
     </div>
 
+    <button id="download-pdf" class="btn pdf">PDF'yi İndir</button>
   </div>
+
+  <script src="https://raw.githubusercontent.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

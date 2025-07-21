@@ -1,88 +1,103 @@
-const expenses = [];
-const form = document.getElementById('expense-form');
-const monthFilter = document.getElementById('month-filter');
-const resetButton = document.getElementById('reset-button');
+let expenses = [];
 
-form.addEventListener('submit', function (e) {
+document.getElementById('expense-form').addEventListener('submit', function (e) {
   e.preventDefault();
+
   const type = document.getElementById('expense-type').value;
   const amount = parseFloat(document.getElementById('expense-amount').value);
   const date = document.getElementById('expense-date').value;
   const payer = document.getElementById('expense-payer').value;
+
+  if (!type || !amount || !date || !payer) return;
+
   expenses.push({ type, amount, date, payer });
-  form.reset();
-  renderMonths();
-  renderExpenses();
-  updateSummary();
-  updateOverall();
+  this.reset();
+  updateMonthOptions();
+  render();
 });
 
-resetButton.addEventListener('click', () => {
-  if (confirm('Tüm masrafları silmek istediğinizden emin misiniz?')) {
-    expenses.length = 0;
-    renderMonths();
-    renderExpenses();
-    updateSummary();
-    updateOverall();
+document.getElementById('month-filter').addEventListener('change', render);
+
+document.getElementById('reset-button').addEventListener('click', () => {
+  if (confirm("Tüm masrafları silmek istediğinize emin misiniz?")) {
+    expenses = [];
+    updateMonthOptions();
+    render();
   }
 });
 
-monthFilter.addEventListener('change', () => {
-  renderExpenses();
-  updateSummary();
+document.getElementById('download-pdf').addEventListener('click', () => {
+  const element = document.getElementById('pdf-area');
+  html2pdf().from(element).save('ofis_masraf_ozeti.pdf');
 });
 
-function renderMonths() {
-  const months = [...new Set(expenses.map(e => e.date.slice(0, 7)))];
-  monthFilter.innerHTML = '';
-  months.forEach(month => {
-    const option = document.createElement('option');
-    option.value = month;
-    option.textContent = month;
-    monthFilter.appendChild(option);
-  });
-  if (!monthFilter.value && months.length > 0) {
-    monthFilter.value = months[months.length - 1];
+function updateMonthOptions() {
+  const select = document.getElementById('month-filter');
+  const uniqueMonths = [...new Set(expenses.map(e => e.date.slice(0, 7)))].sort().reverse();
+
+  select.innerHTML = uniqueMonths.map(month => {
+    const [y, m] = month.split("-");
+    return `<option value="${month}">${y} - ${m}</option>`;
+  }).join("");
+
+  if (!select.value && uniqueMonths.length > 0) {
+    select.value = uniqueMonths[0];
   }
 }
 
-function renderExpenses() {
+function render() {
+  const month = document.getElementById('month-filter').value;
   const tbody = document.querySelector('#expenses-table tbody');
   tbody.innerHTML = '';
-  const selectedMonth = monthFilter.value;
-  const filtered = expenses.filter(e => e.date.slice(0, 7) === selectedMonth);
-  filtered.forEach(exp => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${exp.type}</td><td>${exp.amount.toFixed(2)}</td><td>${exp.date}</td><td>${exp.payer}</td>`;
-    tbody.appendChild(tr);
-  });
-}
 
-function updateSummary() {
-  const selectedMonth = monthFilter.value;
-  const filtered = expenses.filter(e => e.date.slice(0, 7) === selectedMonth);
-  const total = filtered.reduce((sum, exp) => sum + exp.amount, 0);
+  const filtered = expenses.filter(e => e.date.startsWith(month));
+  const total = filtered.reduce((sum, e) => sum + e.amount, 0);
   const perPerson = total / 2;
-  const fatihPaid = filtered.filter(e => e.payer === 'Fatih').reduce((sum, e) => sum + e.amount, 0);
-  const hudaPaid = filtered.filter(e => e.payer === 'Hüda').reduce((sum, e) => sum + e.amount, 0);
-  const balanceFatih = fatihPaid - perPerson;
-  const balanceHuda = hudaPaid - perPerson;
+
+  let fatihTotal = 0;
+  let hudaTotal = 0;
+
+  filtered.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.type}</td>
+      <td>${item.amount.toFixed(2)}</td>
+      <td>${item.date}</td>
+      <td>${item.payer}</td>
+    `;
+    tbody.appendChild(tr);
+
+    if (item.payer === 'Fatih') fatihTotal += item.amount;
+    else hudaTotal += item.amount;
+  });
+
+  const fatihBalance = fatihTotal - perPerson;
+  const hudaBalance = hudaTotal - perPerson;
+
   document.getElementById('total-expense').textContent = total.toFixed(2);
   document.getElementById('per-person').textContent = perPerson.toFixed(2);
-  document.getElementById('balance-fatih').textContent = balanceFatih.toFixed(2);
-  document.getElementById('balance-huda').textContent = balanceHuda.toFixed(2);
-  let settlementText = '-';
-  if (balanceFatih < 0) settlementText = `Fatih, Hüda'ya ${(-balanceFatih).toFixed(2)} TL borçlu.`;
-  else if (balanceHuda < 0) settlementText = `Hüda, Fatih'e ${(-balanceHuda).toFixed(2)} TL borçlu.`;
-  else settlementText = 'Her şey dengede.';
+  document.getElementById('balance-fatih').textContent = fatihBalance.toFixed(2);
+  document.getElementById('balance-huda').textContent = hudaBalance.toFixed(2);
+
+  const settlementText =
+    fatihBalance < 0
+      ? `Fatih, Hüda'ya ${Math.abs(fatihBalance).toFixed(2)} TL borçlu.`
+      : hudaBalance < 0
+      ? `Hüda, Fatih'e ${Math.abs(hudaBalance).toFixed(2)} TL borçlu.`
+      : 'Her şey dengede.';
+
   document.getElementById('settlement').textContent = settlementText;
+
+  // Genel toplamlar (aydan bağımsız)
+  const overallTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const overallFatih = expenses.filter(e => e.payer === 'Fatih').reduce((s, e) => s + e.amount, 0);
+  const overallHuda = expenses.filter(e => e.payer === 'Hüda').reduce((s, e) => s + e.amount, 0);
+
+  document.getElementById('overall-total').textContent = overallTotal.toFixed(2);
+  document.getElementById('overall-fatih').textContent = overallFatih.toFixed(2);
+  document.getElementById('overall-huda').textContent = overallHuda.toFixed(2);
 }
 
-function updateOverall() {
-  const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-  const fatihTotal = expenses.filter(e => e.payer === 'Fatih').reduce((sum, e) => sum + e.amount, 0);
-  const hudaTotal = expenses.filter(e => e.payer === 'Hüda').reduce((sum, e) => sum + e.amount, 0);
-  document.getElementById('overall-total').textContent = total.toFixed(2);
-  document.getElementById('overall-fatih').textContent = fatihTotal.toFixed(2);
-  document.getElementById('overall-huda').textContent = hudaTotal.toFixed(2);
-}
+// Sayfa yüklendiğinde filtre listesi güncellensin
+updateMonthOptions();
+render();
