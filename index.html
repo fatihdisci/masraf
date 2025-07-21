@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ofis Masraf Takip</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Ofis Masraf Takip</h1>
+    <form id="expense-form">
+      <input type="text" id="expense-type" placeholder="Masraf Türü" required>
+      <input type="number" id="expense-amount" placeholder="Tutar (TL)" min="0.01" step="0.01" required>
+      <select id="expense-payer">
+        <option value="Fatih">Fatih</option>
+        <option value="Hüda">Hüda</option>
+      </select>
+      <button type="submit">Ekle</button>
+    </form>
+
+    <table id="expenses-table">
+      <thead>
+        <tr>
+          <th>Tür</th>
+          <th>Tutar (TL)</th>
+          <th>Kim Tarafından</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="summary">
+      <p>Toplam Masraf: <span id="total-expense">0.00</span> TL</p>
+      <p>Kişi Başı Masraf: <span id="per-person">0.00</span> TL</p>
+      <p>Fatih'in Bakiye: <span id="balance-fatih">0.00</span> TL</p>
+      <p>Hüda'nın Bakiye: <span id="balance-huda">0.00</span> TL</p>
+      <p>Kim Kime Borçlu: <span id="settlement">-</span></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
