@@ -1,19 +1,30 @@
 const expenses = [];
 const form = document.getElementById('expense-form');
 const monthFilter = document.getElementById('month-filter');
+const resetButton = document.getElementById('reset-button');
 
-form.addEventListener('submit', function(e) {
+form.addEventListener('submit', function (e) {
   e.preventDefault();
   const type = document.getElementById('expense-type').value;
   const amount = parseFloat(document.getElementById('expense-amount').value);
   const date = document.getElementById('expense-date').value;
   const payer = document.getElementById('expense-payer').value;
-
   expenses.push({ type, amount, date, payer });
   form.reset();
   renderMonths();
   renderExpenses();
   updateSummary();
+  updateOverall();
+});
+
+resetButton.addEventListener('click', () => {
+  if (confirm('Tüm masrafları silmek istediğinizden emin misiniz?')) {
+    expenses.length = 0;
+    renderMonths();
+    renderExpenses();
+    updateSummary();
+    updateOverall();
+  }
 });
 
 monthFilter.addEventListener('change', () => {
@@ -30,6 +41,9 @@ function renderMonths() {
     option.textContent = month;
     monthFilter.appendChild(option);
   });
+  if (!monthFilter.value && months.length > 0) {
+    monthFilter.value = months[months.length - 1];
+  }
 }
 
 function renderExpenses() {
@@ -62,4 +76,13 @@ function updateSummary() {
   else if (balanceHuda < 0) settlementText = `Hüda, Fatih'e ${(-balanceHuda).toFixed(2)} TL borçlu.`;
   else settlementText = 'Her şey dengede.';
   document.getElementById('settlement').textContent = settlementText;
+}
+
+function updateOverall() {
+  const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const fatihTotal = expenses.filter(e => e.payer === 'Fatih').reduce((sum, e) => sum + e.amount, 0);
+  const hudaTotal = expenses.filter(e => e.payer === 'Hüda').reduce((sum, e) => sum + e.amount, 0);
+  document.getElementById('overall-total').textContent = total.toFixed(2);
+  document.getElementById('overall-fatih').textContent = fatihTotal.toFixed(2);
+  document.getElementById('overall-huda').textContent = hudaTotal.toFixed(2);
 }

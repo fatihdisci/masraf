@@ -9,6 +9,7 @@
 <body>
   <div class="container">
     <h1>Ofis Masraf Takip</h1>
+
     <form id="expense-form">
       <input type="text" id="expense-type" placeholder="Masraf Türü" required>
       <input type="number" id="expense-amount" placeholder="Tutar (TL)" min="0.01" step="0.01" required>
@@ -17,11 +18,14 @@
         <option value="Fatih">Fatih</option>
         <option value="Hüda">Hüda</option>
       </select>
-      <button type="submit">Ekle</button>
+      <button type="submit" class="btn">Ekle</button>
+      <button type="button" id="reset-button" class="btn danger">Tümünü Sıfırla</button>
     </form>
 
-    <label for="month-filter">Ay Seç:</label>
-    <select id="month-filter"></select>
+    <div class="filter-box">
+      <label for="month-filter">Ay Seç:</label>
+      <select id="month-filter"></select>
+    </div>
 
     <table id="expenses-table">
       <thead>
@@ -36,12 +40,21 @@
     </table>
 
     <div id="summary">
+      <h2>Seçili Ay Özeti</h2>
       <p>Toplam Masraf: <span id="total-expense">0.00</span> TL</p>
       <p>Kişi Başı Masraf: <span id="per-person">0.00</span> TL</p>
       <p>Fatih'in Bakiye: <span id="balance-fatih">0.00</span> TL</p>
       <p>Hüda'nın Bakiye: <span id="balance-huda">0.00</span> TL</p>
       <p>Kim Kime Borçlu: <span id="settlement">-</span></p>
     </div>
+
+    <div id="overall">
+      <h2>Tüm Zamanların Toplam Durumu</h2>
+      <p>Toplam Masraf: <span id="overall-total">0.00</span> TL</p>
+      <p>Fatih Toplam Ödedi: <span id="overall-fatih">0.00</span> TL</p>
+      <p>Hüda Toplam Ödedi: <span id="overall-huda">0.00</span> TL</p>
+    </div>
+
   </div>
   <script src="script.js"></script>
 </body>
