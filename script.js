@@ -1,5 +1,14 @@
 let expenses = [];
 
+function loadExpenses() {
+  const stored = localStorage.getItem('expenses');
+  expenses = stored ? JSON.parse(stored) : [];
+}
+
+function saveExpenses() {
+  localStorage.setItem('expenses', JSON.stringify(expenses));
+}
+
 const form = document.getElementById('expense-form');
 const monthFilter = document.getElementById('month-filter');
 const resetButton = document.getElementById('reset-button');
@@ -13,12 +22,15 @@ form.addEventListener('submit', e => {
   const payer = document.getElementById('expense-payer').value;
   if (!type || !amount || !date || !payer) return;
   expenses.push({ type, amount, date, payer });
+  saveExpenses();
   form.reset(); updateMonthOptions(); render();
 });
 
 resetButton.addEventListener('click', () => {
   if (confirm('Tüm masrafları silmek istediğinize emin misiniz?')) {
-    expenses = []; updateMonthOptions(); render();
+    expenses = [];
+    saveExpenses();
+    updateMonthOptions(); render();
   }
 });
 
@@ -70,4 +82,6 @@ function render() {
   document.getElementById('overall-huda').textContent = overallHuda.toFixed(2);
 }
 
-updateMonthOptions(); render();
+loadExpenses();
+updateMonthOptions();
+render();
