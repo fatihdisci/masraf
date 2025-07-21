@@ -10,16 +10,30 @@
   <div class="container" id="pdf-area">
     <h1>Ofis Masraf Takip</h1>
 
-    <form id="expense-form">
-      <input type="text" id="expense-type" placeholder="Masraf Türü" required>
-      <input type="number" id="expense-amount" placeholder="Tutar (TL)" min="0.01" step="0.01" required>
-      <input type="date" id="expense-date" required>
-      <select id="expense-payer">
-        <option value="Fatih">Fatih</option>
-        <option value="Hüda">Hüda</option>
-      </select>
-      <button type="submit" class="btn">Ekle</button>
-      <button type="button" id="reset-button" class="btn danger">Tümünü Sıfırla</button>
+    <form id="expense-form" class="form-grid">
+      <div class="form-group">
+        <label for="expense-type">Masraf Türü</label>
+        <input type="text" id="expense-type" placeholder="Örn: Kırtasiye" required>
+      </div>
+      <div class="form-group">
+        <label for="expense-amount">Tutar (TL)</label>
+        <input type="number" id="expense-amount" placeholder="Örn: 150.00" min="0.01" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label for="expense-date">Masraf Tarihi</label>
+        <input type="date" id="expense-date" required>
+      </div>
+      <div class="form-group">
+        <label for="expense-payer">Masrafı Kim Yaptı?</label>
+        <select id="expense-payer">
+          <option value="Fatih">Fatih</option>
+          <option value="Hüda">Hüda</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn primary">Ekle</button>
+        <button type="button" id="reset-button" class="btn danger">Tümünü Sıfırla</button>
+      </div>
     </form>
 
     <div class="filter-box">
@@ -33,7 +47,7 @@
           <th>Tür</th>
           <th>Tutar (TL)</th>
           <th>Tarih</th>
-          <th>Kim Tarafından</th>
+          <th>Kimin</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -55,10 +69,10 @@
       <p>Hüda Toplam Ödedi: <span id="overall-huda">0.00</span> TL</p>
     </div>
 
-    <button id="download-pdf" class="btn pdf">PDF'yi İndir</button>
+    <button id="download-pdf" class="btn secondary">PDF'yi İndir</button>
   </div>
 
-  <script src="https://raw.githubusercontent.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
